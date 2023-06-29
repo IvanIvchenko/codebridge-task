@@ -1,7 +1,7 @@
 import { Request } from 'express';
 
 import { Dog } from '../models/dog.model';
-import { DogFull, RequestBody, ResponseError } from '../utils/interfaces';
+import { DogFull, RequestBody, RequestParams, RequestQuery, ResponseError } from '../utils/interfaces';
 
 export class DogService {
   async create(data: Request<{}, {}, RequestBody>): Promise<DogFull> {
@@ -28,12 +28,12 @@ export class DogService {
     return rowNumber;
   }
 
-  async findAll(
-    page: number,
-    limit: number,
-    order: string,
-    attribute: string,
-  ): Promise<DogFull[]> {
+  async findAll({
+    page,
+    limit,
+    order,
+    attribute,
+  }: RequestQuery): Promise<DogFull[]> {
     const dog = await Dog.findAll({
       offset: (page - 1) * limit,
       limit: Number(limit),
@@ -87,24 +87,15 @@ export class DogService {
   }
 
   async update(
-    id: number,
-    data: Request<{}, {}, RequestBody>,
+    req: Request<RequestParams, {}, RequestBody>,
   ): Promise<DogFull> {
-    if (!data.body) {
-      const err: ResponseError = new Error(
-        'Dog data is required and was not provided',
-      );
-      err.statusCode = 500;
-      throw err;
-    }
-
-    const dog = await Dog.findOne({ where: { id: id } });
+    const dog = await Dog.findOne({ where: { id: req.params.id } });
 
     const updatedDog = await dog?.update({
-      name: data.body.name || dog.name,
-      color: data.body.color || dog.color,
-      tail_length: data.body.tail_length || dog.tail_length,
-      weight: data.body.weight || dog.weight,
+      name: req.body.name || dog.name,
+      color: req.body.color || dog.color,
+      tail_length: req.body.tail_length || dog.tail_length,
+      weight: req.body.weight || dog.weight,
     });
 
     if (updatedDog) {

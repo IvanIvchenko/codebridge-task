@@ -1,8 +1,6 @@
 import { ConnectionError, Sequelize } from 'sequelize';
 import 'dotenv/config';
 
-console.log(process.env.DB_PASSWORD);
-
 export const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USERNAME,

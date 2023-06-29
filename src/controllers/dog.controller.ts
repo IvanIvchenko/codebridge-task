@@ -34,12 +34,7 @@ export class DogController {
   ): Promise<void> {
     try {
       const rowNumber = await this.dogService.getRowNumber();
-      const foundDogs = await this.dogService.findAll(
-        req.query.page,
-        req.query.limit,
-        req.query.order,
-        req.query.attribute,
-      );
+      const foundDogs = await this.dogService.findAll(req.query);
       res
         .status(200)
         .set({
@@ -80,7 +75,7 @@ export class DogController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      res.status(200).json(await this.dogService.update(req.params.id, req));
+      res.status(200).json(await this.dogService.update(req));
     } catch (err) {
       if (err instanceof Error) {
         console.error('Error while updating a dog:', err.message);
